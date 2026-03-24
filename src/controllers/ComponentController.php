@@ -49,7 +49,14 @@ class ComponentController extends Controller
             $component->handleAction($action, $request->bodyParams);
         }
 
-        Yii::$app->response->format = Response::FORMAT_HTML;
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_HTML;
+
+        if ($component->noCache) {
+            $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
+        }
 
         return $component->renderFragment();
     }

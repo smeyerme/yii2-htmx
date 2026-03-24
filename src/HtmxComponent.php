@@ -41,6 +41,9 @@ class HtmxComponent extends Widget
     /** @var array Extra HTML attributes for the wrapper element */
     public array $wrapperOptions = [];
 
+    /** @var bool Whether to send no-cache headers on HTMX responses */
+    public bool $noCache = false;
+
     /** @var string|null Set by handleAction to override the default render behavior */
     protected ?string $actionSwap = null;
 
