@@ -1,0 +1,27 @@
+{
+    "name": "giantbits/yii2-htmx",
+    "description": "HTMX-powered component framework for Yii2 — React/Vue-like DX with server-rendered components",
+    "type": "yii2-extension",
+    "keywords": ["yii2", "htmx", "components", "widget", "server-side-rendering"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Giantbits"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "yiisoft/yii2": "~2.0.45"
+    },
+    "suggest": {
+        "yiisoft/yii2-twig": "Required for .twig component templates (~2.4)"
+    },
+    "autoload": {
+        "psr-4": {
+            "giantbits\\htmx\\": "src/"
+        }
+    },
+    "extra": {
+        "bootstrap": "giantbits\\htmx\\Bootstrap"
+    }
+}
