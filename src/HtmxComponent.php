@@ -53,6 +53,9 @@ class HtmxComponent extends Widget
     /** @var array Extra response headers to send (e.g., HX-Trigger) */
     protected array $responseHeaders = [];
 
+    /** @var \yii\base\Model|null Bound model instance, populated via bindModel() */
+    public ?\yii\base\Model $model = null;
+
     /** @var string Route to the component controller. Override if you customized the route. */
     public static string $controllerRoute = 'htmx-component/render';
 
@@ -76,6 +79,11 @@ class HtmxComponent extends Widget
         }
 
         $this->resolveState();
+
+        // Populate model for template access (no POST loading on initial render)
+        if ($this->model === null) {
+            $this->model = $this->bindModel();
+        }
 
         $innerHtml = $this->renderView();
         return $this->wrapHtml($innerHtml);
@@ -103,6 +111,11 @@ class HtmxComponent extends Widget
 
         $this->resolveState();
 
+        // Populate model for template access if not already set by handleAction
+        if ($this->model === null) {
+            $this->model = $this->bindModel();
+        }
+
         $innerHtml = $this->renderView();
         return $this->wrapHtml($innerHtml);
     }
@@ -113,6 +126,22 @@ class HtmxComponent extends Widget
     protected function resolveState(): void
     {
         // Override in subclass
+    }
+
+    /**
+     * Override to return a model for automatic POST data binding.
+     *
+     * Called after resolveState(). The returned model will be available as
+     * $this->model in actions and templates. On POST requests, the model
+     * is automatically loaded with request data via $model->load().
+     *
+     * Works with any yii\base\Model subclass (ActiveRecord, CrelishDynamicModel, etc.).
+     *
+     * @return \yii\base\Model|null
+     */
+    protected function bindModel(): ?\yii\base\Model
+    {
+        return null;
     }
 
     /**
@@ -136,6 +165,15 @@ class HtmxComponent extends Widget
         $allowed = $this->actions();
         if (!in_array($action, $allowed, true)) {
             throw new \yii\web\BadRequestHttpException("Unknown action: {$action}");
+        }
+
+        // Resolve state so bindModel() can use loaded data
+        $this->resolveState();
+
+        // Auto-bind model from POST data
+        $this->model = $this->bindModel();
+        if ($this->model !== null && Yii::$app->request->isPost) {
+            $this->model->load(Yii::$app->request->post());
         }
 
         $method = 'action' . ucfirst($action);
